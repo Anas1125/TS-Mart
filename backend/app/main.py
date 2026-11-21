@@ -20,7 +20,10 @@ UPLOADS=Path(__file__).resolve().parent.parent/'uploads'
 UPLOADS.mkdir(exist_ok=True)
 @asynccontextmanager
 async def lifespan(app):
-    Base.metadata.create_all(engine)
+    # SQLite may bootstrap locally. PostgreSQL schema changes must be applied
+    # once via Alembic, not concurrently by serverless function instances.
+    if config.database_url.startswith('sqlite'):
+        Base.metadata.create_all(engine)
     yield
 app=FastAPI(title='TS Mart API',lifespan=lifespan)
 app.add_middleware(CORSMiddleware,allow_origins=config.allowed_origins,allow_credentials=True,allow_methods=['GET','POST','PUT','DELETE'],allow_headers=['Content-Type'])
