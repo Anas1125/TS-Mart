@@ -1,0 +1,20 @@
+.env
+.venv/
+__pycache__/
+.pytest_cache/
+*.db
+node_modules/
+dist/
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Local and sensitive files
+.DS_Store
+.env.*
+!.env.example
+*.sqlite3
+
+# Development backups
+frontend/src_backup/
+frontend/src/styles.backup.css
+frontend/src/styles.dark-backup.css
