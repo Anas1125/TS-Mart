@@ -6,6 +6,7 @@ import re
 class Credentials(BaseModel):
     email: str = Field(min_length=5, max_length=254)
     password: str = Field(min_length=10, max_length=128)
+    remember_me: bool = False
     name: str = Field(default='Customer', min_length=2, max_length=100)
     @field_validator('email')
     @classmethod
