@@ -348,3 +348,31 @@ dialog::backdrop { background: #2b241a75; }
   html { scroll-behavior: auto; }
 }
 html { scroll-behavior: smooth; }
+
+
+/* Password visibility toggle — customer registration, sign-in, and admin login */
+.password-field-group { margin-bottom: 18px; }
+.password-field-group > label { margin-bottom: 8px; }
+.password-input-wrap { position: relative; width: 100%; }
+.password-input-wrap > input { width: 100%; padding-right: 52px; }
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 7px;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #93703a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color .18s ease, color .18s ease;
+}
+.password-toggle:hover { background: #f8edd7; color: #644817; }
+.password-toggle:focus-visible { outline: 2px solid #bc8732; outline-offset: 2px; }
+.password-toggle svg { pointer-events: none; }
