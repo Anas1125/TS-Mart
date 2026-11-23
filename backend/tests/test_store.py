@@ -47,6 +47,33 @@ def test_registration_login_and_logout():
         assert c.post('/api/auth/login',json=credentials).status_code==200
         assert 'httponly' in c.post('/api/auth/login',json=credentials).headers['set-cookie'].lower()
 
+def test_remember_me_cookie_security_and_role_separation():
+    with TestClient(app) as client:
+        admin_credentials = {'email':'admin@example.com','password':'admin-test-password'}
+        customer_credentials = {'email':'shopper@example.com','password':'test-password-strong'}
+
+        # Existing customer credentials do not authenticate as administrator.
+        response = client.post('/api/auth/admin', json=customer_credentials)
+        assert response.status_code == 401
+
+        # Without opt-in: session cookie only, no browser persistence.
+        response = client.post('/api/auth/admin', json=admin_credentials)
+        assert response.status_code == 200
+        assert 'max-age=' not in response.headers['set-cookie'].lower()
+        assert 'httponly' in response.headers['set-cookie'].lower()
+
+        # Opt-in: bounded persistent session, shorter for administrators.
+        response = client.post('/api/auth/admin', json={**admin_credentials, 'remember_me': True})
+        assert response.status_code == 200
+        assert 'max-age=604800' in response.headers['set-cookie'].lower()
+        assert client.get('/api/me').json()['role'] == 'admin'
+
+        response = client.post('/api/auth/login', json={**customer_credentials, 'remember_me': True})
+        assert response.status_code == 200
+        assert 'max-age=2592000' in response.headers['set-cookie'].lower()
+        assert client.get('/api/me').json()['role'] == 'customer'
+
+
 def test_server_pricing_and_successful_cod(client):
     data=payload();data['total']=1;data['items'][0]['price']=1
     r=client.post('/api/orders',json=data);assert r.status_code==200,r.text
