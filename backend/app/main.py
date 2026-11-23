@@ -93,9 +93,15 @@ def authenticate(action:str,data:Credentials,request:Request,response:Response,d
     old=request.cookies.get('ts_session','')
     db.execute(delete(Session).where(Session.token_hash==hashlib.sha256(old.encode()).hexdigest()))
     token=secrets.token_urlsafe(32)
-    db.add(Session(token_hash=hashlib.sha256(token.encode()).hexdigest(),user_id=user.id,role='admin' if action=='admin' else 'customer',expires=now()+timedelta(days=7)))
+    # A normal sign-in uses a browser-session cookie. Remember me persists
+    # across browser restarts, with a shorter cap for privileged accounts.
+    session_seconds = (7 * 86400 if action == 'admin' else 30 * 86400) if data.remember_me else (8 * 3600 if action == 'admin' else 12 * 3600)
+    db.add(Session(token_hash=hashlib.sha256(token.encode()).hexdigest(),user_id=user.id,role='admin' if action=='admin' else 'customer',expires=now()+timedelta(seconds=session_seconds)))
     db.commit()
-    response.set_cookie('ts_session',token,httponly=True,secure=config.cookie_secure,samesite='lax',max_age=604800,path='/')
+    cookie_options = dict(httponly=True, secure=config.cookie_secure, samesite='lax', path='/')
+    if data.remember_me:
+        cookie_options['max_age'] = session_seconds
+    response.set_cookie('ts_session', token, **cookie_options)
     return {'name':getattr(user,'name','Administrator'),'role':'admin' if action=='admin' else 'customer','email':user.email}
 @app.get('/api/me')
 def me(user=Depends(identity),db=Depends(get_db)):
