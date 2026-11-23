@@ -376,3 +376,26 @@ html { scroll-behavior: smooth; }
 .password-toggle:hover { background: #f8edd7; color: #644817; }
 .password-toggle:focus-visible { outline: 2px solid #bc8732; outline-offset: 2px; }
 .password-toggle svg { pointer-events: none; }
+
+/* Optional persistent login, within the existing ivory-and-gold design */
+.auth-form .remember-me {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin: 2px 0 17px;
+  color: #56432a;
+  font-size: .85rem;
+}
+.auth-form .remember-me input {
+  width: 17px;
+  height: 17px;
+  margin: 0;
+  accent-color: #b88933;
+}
+.auth-form .remember-note {
+  margin-left: auto;
+  color: #85745c;
+  font-size: .75rem;
+}
