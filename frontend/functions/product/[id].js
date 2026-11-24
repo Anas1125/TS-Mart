@@ -65,10 +65,10 @@ export async function onRequestGet({ request, env, params }) {
     .on('meta[property="og:title"]', { element(e) { e.setAttribute("content", title); } })
     .on('meta[property="og:description"]', { element(e) { e.setAttribute("content", description); } })
     .on('meta[property="og:url"]', { element(e) { e.setAttribute("content", canonical); } })
+    .on('meta[property="og:type"]', { element(e) { e.setAttribute("content", "product"); } })
     .on('meta[name="twitter:title"]', { element(e) { e.setAttribute("content", title); } })
     .on('meta[name="twitter:description"]', { element(e) { e.setAttribute("content", description); } })
     .on("head", { element(e) {
-      e.append('<meta property="og:type" content="product">', { html: true });
       if (demo) e.append('<meta name="robots" content="noindex, follow">', { html: true });
       if (structured) e.append('<script id="ts-product-schema" type="application/ld+json">' + safeJson(structured) + '</script>', { html: true });
     } })
