@@ -1,9 +1,6 @@
 // Server-set SEO metadata for public product pages on Cloudflare Pages.
 // The storefront still renders interactively with React/Vite.
 const SITE = "https://ts-mart.pages.dev";
-const html = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({
-  "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
-}[c]));
 const safeJson = (obj) => JSON.stringify(obj).replace(/</g, "\\u003c");
 
 export async function onRequestGet({ request, env, params }) {
@@ -68,10 +65,12 @@ export async function onRequestGet({ request, env, params }) {
     .on('meta[property="og:title"]', { element(e) { e.setAttribute("content", title); } })
     .on('meta[property="og:description"]', { element(e) { e.setAttribute("content", description); } })
     .on('meta[property="og:url"]', { element(e) { e.setAttribute("content", canonical); } })
+    .on('meta[name="twitter:title"]', { element(e) { e.setAttribute("content", title); } })
+    .on('meta[name="twitter:description"]', { element(e) { e.setAttribute("content", description); } })
     .on("head", { element(e) {
       e.append('<meta property="og:type" content="product">', { html: true });
       if (demo) e.append('<meta name="robots" content="noindex, follow">', { html: true });
-      if (structured) e.append('<script type="application/ld+json">' + safeJson(structured) + '</script>', { html: true });
+      if (structured) e.append('<script id="ts-product-schema" type="application/ld+json">' + safeJson(structured) + '</script>', { html: true });
     } })
     .transform(asset);
   const headers = new Headers(rewritten.headers);
