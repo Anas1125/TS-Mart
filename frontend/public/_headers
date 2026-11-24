@@ -1,0 +1,17 @@
+# Keep authenticated, private and checkout pages out of search results.
+/admin
+  X-Robots-Tag: noindex, nofollow
+/account
+  X-Robots-Tag: noindex, nofollow
+/cart
+  X-Robots-Tag: noindex, nofollow
+/orders
+  X-Robots-Tag: noindex, nofollow
+/rewards
+  X-Robots-Tag: noindex, nofollow
+/games
+  X-Robots-Tag: noindex, nofollow
+
+# Static hashed Vite bundles are immutable.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
