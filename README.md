@@ -134,6 +134,41 @@ The baseline revision contains the complete initial store and arcade schema. No 
 
 Back up databases before production migrations. API startup and seeding can create missing tables for development, but do not alter existing columns; use Alembic for versioned upgrades.
 
+
+## Search engine optimization (Cloudflare Pages)
+
+Production canonical origin: `https://ts-mart.pages.dev`. If moving to a custom domain,
+update `frontend/index.html`, `frontend/src/seo.tsx`, the Cloudflare Pages
+`functions/product/[id].js`, `functions/sitemap.xml.js`, `functions/arcade.js`,
+and `public/robots.txt` before requesting indexing.
+
+- `/robots.txt` advertises the live sitemap and disallows private API crawling.
+- `/sitemap.xml` is a Cloudflare Pages Function that lists the homepage, public
+  arcade page, and active non-demo product pages returned by the FastAPI catalog.
+  It requires the existing Cloudflare `API_ORIGIN` environment variable.
+- `/product/:id` returns crawler-visible product title, description, canonical,
+  Open Graph/Twitter metadata, and (for real merchandise) Product/Offer JSON-LD.
+  Unknown IDs return 404. Backend outages return 503 rather than false 404s.
+- `/arcade` has crawler-visible dedicated title/description/canonical metadata.
+- The React SEO manager updates titles, canonicals, social metadata, and structured
+  data on client-side navigation.
+- Admin, account, cart, orders, rewards, and private game routes carry noindex
+  headers; they never appear in the sitemap.
+- **Demo protection:** seeded products retain `DEMO-` SKUs and are intentionally
+  excluded from the sitemap and marked noindex. Once a product becomes genuine
+  merchandise, replace its title, description, SKU, images, prices, and inventory.
+  Use a non-demo SKU only after the listing and stock are real. Do not submit demo
+  merchandise as product-rich results.
+- JSON-LD reflects TS Mart's own price and availability in integer paise; it never
+  invents third-party prices, customer reviews, shipping promises, or ratings.
+- Product images uploaded by admin currently need permanent object storage before
+  they can be relied on for shopping search and social previews.
+
+After Cloudflare deploys, verify `/robots.txt`, `/sitemap.xml`,
+`/product/<real-id>`, and `/arcade`. Check HTML source for canonical and metadata.
+Submit `https://ts-mart.pages.dev/sitemap.xml` through Google Search Console.
+The sitemap and metadata facilitate discovery but do not guarantee indexing or ranking.
+
 ## Validation
 
 ```sh
